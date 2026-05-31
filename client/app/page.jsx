@@ -1,17 +1,17 @@
 "use client";
 
 export const dynamic = "force-dynamic";
-import { useState, useEffect } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import api from "@/lib/axios";
 import ProductCard from "@/components/ProductCard";
 
 const CATEGORIES = ["All", "Electronics", "Fashion", "Books", "Home", "Sports"];
 const SORT_OPTIONS = [
-  { value: "newest",     label: "Newest First" },
-  { value: "price_asc",  label: "Price: Low to High" },
+  { value: "newest", label: "Newest First" },
+  { value: "price_asc", label: "Price: Low to High" },
   { value: "price_desc", label: "Price: High to Low" },
-  { value: "rating",     label: "Top Rated" },
+  { value: "rating", label: "Top Rated" },
 ];
 
 function SkeletonCard() {
@@ -31,12 +31,14 @@ function SkeletonCard() {
   );
 }
 
-export default function HomePage() {
+function HomePageContent() {
   const searchParams = useSearchParams();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState(searchParams.get("category") || "All");
+  const [category, setCategory] = useState(
+    searchParams.get("category") || "All",
+  );
   const [sort, setSort] = useState("newest");
 
   const fetchProducts = async () => {
@@ -54,7 +56,9 @@ export default function HomePage() {
     }
   };
 
-  useEffect(() => { fetchProducts(); }, [category, sort]);
+  useEffect(() => {
+    fetchProducts();
+  }, [category, sort]);
 
   return (
     <div>
@@ -74,20 +78,30 @@ export default function HomePage() {
             </div>
             <h1 className="font-display font-bold text-4xl md:text-6xl text-ink leading-[1.08] tracking-tight mb-5">
               Discover{" "}
-              <em className="font-serif not-italic text-brand italic">premium</em>
-              <br />products for less
+              <em className="font-serif not-italic text-brand italic">
+                premium
+              </em>
+              <br />
+              products for less
             </h1>
             <p className="text-ink-muted text-lg leading-relaxed mb-8 max-w-lg">
-              Top picks across electronics, fashion, books and more — curated for quality, delivered fast.
+              Top picks across electronics, fashion, books and more — curated
+              for quality, delivered fast.
             </p>
             <div className="flex gap-3 flex-wrap">
               <button
                 className="btn-blue px-7 py-3 text-sm"
-                onClick={() => document.getElementById("products")?.scrollIntoView({ behavior: "smooth" })}
+                onClick={() =>
+                  document
+                    .getElementById("products")
+                    ?.scrollIntoView({ behavior: "smooth" })
+                }
               >
                 Shop Now
               </button>
-              <button className="btn-ghost px-6 py-3 text-sm">View Deals</button>
+              <button className="btn-ghost px-6 py-3 text-sm">
+                View Deals
+              </button>
             </div>
 
             {/* Stats */}
@@ -99,8 +113,12 @@ export default function HomePage() {
                 { num: "100%", label: "Secure" },
               ].map(({ num, label }) => (
                 <div key={label}>
-                  <div className="font-display font-bold text-xl text-ink">{num}</div>
-                  <div className="text-xs text-ink-faint font-medium mt-0.5">{label}</div>
+                  <div className="font-display font-bold text-xl text-ink">
+                    {num}
+                  </div>
+                  <div className="text-xs text-ink-faint font-medium mt-0.5">
+                    {label}
+                  </div>
                 </div>
               ))}
             </div>
@@ -110,10 +128,12 @@ export default function HomePage() {
 
       {/* Products */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10" id="products">
-
         {/* Search */}
         <form
-          onSubmit={(e) => { e.preventDefault(); fetchProducts(); }}
+          onSubmit={(e) => {
+            e.preventDefault();
+            fetchProducts();
+          }}
           className="flex gap-3 mb-8 max-w-xl"
         >
           <input
@@ -122,7 +142,9 @@ export default function HomePage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-          <button type="submit" className="btn-blue px-5">Search</button>
+          <button type="submit" className="btn-blue px-5">
+            Search
+          </button>
         </form>
 
         {/* Filters row */}
@@ -148,7 +170,9 @@ export default function HomePage() {
             onChange={(e) => setSort(e.target.value)}
           >
             {SORT_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>{o.label}</option>
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
             ))}
           </select>
         </div>
@@ -164,20 +188,36 @@ export default function HomePage() {
         {/* Grid */}
         {loading ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {[...Array(8)].map((_, i) => <SkeletonCard key={i} />)}
+            {[...Array(8)].map((_, i) => (
+              <SkeletonCard key={i} />
+            ))}
           </div>
         ) : products.length === 0 ? (
           <div className="text-center py-24">
             <div className="text-5xl mb-4">🔍</div>
-            <h3 className="font-display font-bold text-lg text-ink mb-2">No products found</h3>
-            <p className="text-ink-muted text-sm">Try a different search or category.</p>
+            <h3 className="font-display font-bold text-lg text-ink mb-2">
+              No products found
+            </h3>
+            <p className="text-ink-muted text-sm">
+              Try a different search or category.
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {products.map((p) => <ProductCard key={p._id} product={p} />)}
+            {products.map((p) => (
+              <ProductCard key={p._id} product={p} />
+            ))}
           </div>
         )}
       </div>
     </div>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <HomePageContent />
+    </Suspense>
   );
 }
