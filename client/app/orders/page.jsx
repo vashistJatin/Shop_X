@@ -1,4 +1,5 @@
 "use client";
+export const dynamic = "force-dynamic";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { selectUser } from "@/store/authSlice";
